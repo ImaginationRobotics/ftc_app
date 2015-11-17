@@ -43,7 +43,7 @@ public class TankDrive_Bucket extends OpMode{
 
     @Override
     public void init(){
-        motorFR = hardwareMap.dcMotor.get("motorFR");
+        motorFR = hardwareMap.dcMotor.get("motorRight");
         motorBR = hardwareMap.dcMotor.get("motorBR");
 
         motorFL = hardwareMap.dcMotor.get("motorFL");

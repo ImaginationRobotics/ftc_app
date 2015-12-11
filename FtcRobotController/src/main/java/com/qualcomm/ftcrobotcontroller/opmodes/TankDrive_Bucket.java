@@ -1,8 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -14,25 +13,23 @@ import com.qualcomm.robotcore.util.Range;
 
 public class TankDrive_Bucket extends OpMode{
     //Static Ranges for servos
-    final static double BUCKET_LIFT_LEFT_MIN_RANGE = 1;
-    final static double BUCKET_LIFT_LEFT_MAX_RANGE = 0.05;
-    final static double BUCKET_LIFT_RIGHT_MIN_RANGE = 0;
-    final static double BUCKET_LIFT_RIGHT_MAX_RANGE = 1;
+//    final static double BUCKET_LIFT_LEFT_MIN_RANGE = 1;
+//    final static double BUCKET_LIFT_LEFT_MAX_RANGE = 0.05;
+//    final static double BUCKET_LIFT_RIGHT_MIN_RANGE = 0;
+//    final static double BUCKET_LIFT_RIGHT_MAX_RANGE = 1;
 
     //Servo positions
-    double bucketLiftRightPos;
-    double bucketLiftLeftPos;
+//    double bucketLiftRightPos;
+//    double bucketLiftLeftPos;
 
     //Servo change amount
-    double bucketLiftDelta = 0.01; //Amount to change the servos
+//    double bucketLiftDelta = 0.01; //Amount to change the servos
 
     //Motors and servos
-    DcMotor motorFR;
-    DcMotor motorFL;
-    DcMotor motorBR;
-    DcMotor motorBL;
-    Servo bucketLiftRight;
-    Servo bucketLiftLeft;
+    DcMotor motorRight;
+    DcMotor motorLeft;
+//    Servo bucketLiftRight;
+//    Servo bucketLiftLeft;
 
     /**
      * Constructors
@@ -43,19 +40,16 @@ public class TankDrive_Bucket extends OpMode{
 
     @Override
     public void init(){
-        motorFR = hardwareMap.dcMotor.get("motorRight");
-        motorBR = hardwareMap.dcMotor.get("motorBR");
+        motorRight = hardwareMap.dcMotor.get("motorRight");
 
-        motorFL = hardwareMap.dcMotor.get("motorFL");
-        motorFL.setDirection(DcMotor.Direction.REVERSE);
-        motorBL = hardwareMap.dcMotor.get("motorBL");
-        motorBL.setDirection(DcMotor.Direction.REVERSE);
+        motorLeft = hardwareMap.dcMotor.get("motorLeft");
+        motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        bucketLiftRight = hardwareMap.servo.get("servo_1");
-        bucketLiftLeft = hardwareMap.servo.get("servo_2");
-
-        bucketLiftRightPos = 0.5;
-        bucketLiftLeftPos = 0.5;
+        //bucketLiftRight = hardwareMap.servo.get("servo_1");
+//        bucketLiftLeft = hardwareMap.servo.get("servo_2");
+//
+//        bucketLiftRightPos = 0.5;
+//        bucketLiftLeftPos = 0.5;
     }
 
     @Override
@@ -69,33 +63,31 @@ public class TankDrive_Bucket extends OpMode{
         rightDrive = (float)scaleInput(rightDrive);
         leftDrive = (float)scaleInput(leftDrive);
 
-        motorFR.setPower(rightDrive);
-        motorBR.setPower(rightDrive);
-        motorFL.setPower(leftDrive);
-        motorBL.setPower(leftDrive);
-
-        if(gamepad1.right_bumper){
-            bucketLiftRightPos -= bucketLiftDelta;
-            bucketLiftLeftPos += bucketLiftDelta;
-        }
-
-        if(gamepad1.right_trigger > 0.1){
-            bucketLiftRightPos += bucketLiftDelta;
-            bucketLiftLeftPos -= bucketLiftDelta;
-        }
-
-        bucketLiftRightPos = Range.clip(bucketLiftRightPos, BUCKET_LIFT_RIGHT_MIN_RANGE, BUCKET_LIFT_RIGHT_MAX_RANGE);
-        bucketLiftLeftPos = Range.clip(bucketLiftLeftPos, BUCKET_LIFT_LEFT_MAX_RANGE, BUCKET_LIFT_LEFT_MIN_RANGE);
-
-        bucketLiftRight.setPosition(bucketLiftRightPos);
-        bucketLiftLeft.setPosition(bucketLiftLeftPos);
-
+        motorRight.setPower(rightDrive);
+        motorLeft.setPower(leftDrive);
+//
+//        if(gamepad1.right_bumper){
+//            bucketLiftRightPos -= bucketLiftDelta;
+//            bucketLiftLeftPos += bucketLiftDelta;
+//        }
+//
+//        if(gamepad1.right_trigger > 0.1){
+//            bucketLiftRightPos += bucketLiftDelta;
+//            bucketLiftLeftPos -= bucketLiftDelta;
+//        }
+//
+//        bucketLiftRightPos = Range.clip(bucketLiftRightPos, BUCKET_LIFT_RIGHT_MIN_RANGE, BUCKET_LIFT_RIGHT_MAX_RANGE);
+//        bucketLiftLeftPos = Range.clip(bucketLiftLeftPos, BUCKET_LIFT_LEFT_MAX_RANGE, BUCKET_LIFT_LEFT_MIN_RANGE);
+//
+//        bucketLiftRight.setPosition(bucketLiftRightPos);
+//        bucketLiftLeft.setPosition(bucketLiftLeftPos);
+//
         telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
         telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
         telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
         telemetry.addData("Left stick", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
-        telemetry.addData("Right servo", "Right servo: " + String.format("%.2f", bucketLiftRightPos));
-        telemetry.addData("Left servo", "Left servo: " + String.format("%.2f", bucketLiftLeftPos));
+//        telemetry.addData("Right servo", "Right servo: " + String.format("%.2f", bucketLiftRightPos));
+//        telemetry.addData("Left servo", "Left servo: " + String.format("%.2f", bucketLiftLeftPos));
     }
 
     @Override

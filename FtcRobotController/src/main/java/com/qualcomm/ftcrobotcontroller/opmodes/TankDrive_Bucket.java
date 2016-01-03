@@ -5,57 +5,56 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-/**
- * Created by Thomas on 10/31/2015.
+/**TankDrive_Bucket
  *
- * Update Nov 7
- *  Changed
+ * Code to drive two motors in tank drive, two hinge servos,
+ *      one conveyor servo, and one worm driven arm.
  */
 
 public class TankDrive_Bucket extends OpMode{
-    //Static Ranges for servos
-    final static double BUCKET_LIFT_LEFT_MIN_RANGE = 1;
-    final static double BUCKET_LIFT_LEFT_MAX_RANGE = 0.05;
-    final static double BUCKET_LIFT_RIGHT_MIN_RANGE = 0;
-    final static double BUCKET_LIFT_RIGHT_MAX_RANGE = 1;
+    //Servo position values
+    double doorRightClose = 0;
+    double doorRightOpen = .6;
 
-    //Servo positions
-    double bucketLiftRightPos;
-    double bucketLiftLeftPos;
+    double doorLeftClose = 1;
+    double doorLeftOpen = .4;
 
-    //Servo change amount
-    double bucketLiftDelta = 0.01; //Amount to change the servos
+    double conveyorStop = .48;
+    double conveyorRight = 1;
+    double conveyorLeft = 0;
 
     //Motors and servos
-    DcMotor motorFR;
-    DcMotor motorFL;
-    DcMotor motorBR;
-    DcMotor motorBL;
-    Servo bucketLiftRight;
-    Servo bucketLiftLeft;
+    DcMotor motorRight;
+    DcMotor motorLeft;
+//    DcMotor motorArm;
+    Servo doorRight;
+    Servo doorLeft;
+    Servo conveyorServo;
 
-    /**
-     * Constructors
-     */
+    /** Constructors*/
     public TankDrive_Bucket(){
-
     }
 
     @Override
     public void init(){
-        motorFR = hardwareMap.dcMotor.get("motorRight");
-        motorBR = hardwareMap.dcMotor.get("motorBR");
+        //Drive motors
+        motorRight = hardwareMap.dcMotor.get("motorRight");
+        motorLeft = hardwareMap.dcMotor.get("motorLeft");
+        motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        motorFL = hardwareMap.dcMotor.get("motorFL");
-        motorFL.setDirection(DcMotor.Direction.REVERSE);
-        motorBL = hardwareMap.dcMotor.get("motorBL");
-        motorBL.setDirection(DcMotor.Direction.REVERSE);
+//        motorArm = hardwareMap.dcMotor.get("motorArm");
 
-        bucketLiftRight = hardwareMap.servo.get("servo_1");
-        bucketLiftLeft = hardwareMap.servo.get("servo_2");
+        //Bucket motors and servos
+        doorRight = hardwareMap.servo.get("doorRight");
+        doorLeft = hardwareMap.servo.get("doorLeft");
+        conveyorServo = hardwareMap.servo.get("conveyor");
 
-        bucketLiftRightPos = 0.5;
-        bucketLiftLeftPos = 0.5;
+        //Set the conveyor position
+        conveyorServo.setPosition(conveyorStop);
+
+        //Set the door positions
+        doorRight.setPosition(doorRightClose);
+        doorLeft.setPosition(doorLeftClose);
     }
 
     @Override
@@ -69,33 +68,47 @@ public class TankDrive_Bucket extends OpMode{
         rightDrive = (float)scaleInput(rightDrive);
         leftDrive = (float)scaleInput(leftDrive);
 
-        motorFR.setPower(rightDrive);
-        motorBR.setPower(rightDrive);
-        motorFL.setPower(leftDrive);
-        motorBL.setPower(leftDrive);
+        //Set motor power
+        motorRight.setPower(rightDrive);
+        motorLeft.setPower(leftDrive);
 
-        if(gamepad1.right_bumper){
-            bucketLiftRightPos -= bucketLiftDelta;
-            bucketLiftLeftPos += bucketLiftDelta;
+//        //Arm Motor using Right Bumper and Trigger
+//        if(gamepad1.right_bumper){
+//            motorArm.setPower(.2);
+//        }else if(gamepad1.right_trigger > .2){
+//            motorArm.setPower(-.2);
+//        }else{
+//            motorArm.setPower(0);
+//        }
+
+        //Door Right open and Conveyor Right
+        if(gamepad1.dpad_right){
+            if(doorRight.getPosition() == doorRightOpen){
+                doorRight.setPosition(doorRightClose);
+                conveyorServo.setPosition(conveyorStop);
+
+            }else if(doorRight.getPosition() == doorRightClose){
+                doorRight.setPosition(doorRightOpen);
+                conveyorServo.setPosition(conveyorRight);
+            }
         }
 
-        if(gamepad1.right_trigger > 0.1){
-            bucketLiftRightPos += bucketLiftDelta;
-            bucketLiftLeftPos -= bucketLiftDelta;
+        //Door Left open and Conveyor Left
+        if(gamepad1.dpad_left){
+            if(doorLeft.getPosition() == doorLeftOpen){
+                doorLeft.setPosition(doorLeftClose);
+                conveyorServo.setPosition(conveyorStop);
+            }else if(doorLeft.getPosition() == doorLeftClose){
+                doorLeft.setPosition(doorLeftOpen);
+                conveyorServo.setPosition(conveyorLeft);
+            }
         }
 
-        bucketLiftRightPos = Range.clip(bucketLiftRightPos, BUCKET_LIFT_RIGHT_MIN_RANGE, BUCKET_LIFT_RIGHT_MAX_RANGE);
-        bucketLiftLeftPos = Range.clip(bucketLiftLeftPos, BUCKET_LIFT_LEFT_MAX_RANGE, BUCKET_LIFT_LEFT_MIN_RANGE);
-
-        bucketLiftRight.setPosition(bucketLiftRightPos);
-        bucketLiftLeft.setPosition(bucketLiftLeftPos);
-
+        //Telemetry
         telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
         telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
         telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
         telemetry.addData("Left stick", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
-        telemetry.addData("Right servo", "Right servo: " + String.format("%.2f", bucketLiftRightPos));
-        telemetry.addData("Left servo", "Left servo: " + String.format("%.2f", bucketLiftLeftPos));
     }
 
     @Override

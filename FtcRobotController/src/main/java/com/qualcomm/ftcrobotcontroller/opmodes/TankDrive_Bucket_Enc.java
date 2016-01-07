@@ -2,6 +2,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -11,7 +12,7 @@ import com.qualcomm.robotcore.util.Range;
  *      one conveyor servo, and one worm driven arm.
  */
 
-public class TankDrive_Bucket extends OpMode{
+public class TankDrive_Bucket_Enc extends OpMode{
     //Servo position values
     double doorRightClose = 0;
     double doorRightOpen = .6;
@@ -32,14 +33,17 @@ public class TankDrive_Bucket extends OpMode{
     Servo conveyorServo;
 
     /** Constructors*/
-    public TankDrive_Bucket(){
+    public TankDrive_Bucket_Enc(){
     }
 
     @Override
     public void init(){
         //Drive motors
         motorRight = hardwareMap.dcMotor.get("motorRight");
+        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
+        motorLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
         //Arm motor, reversed so 1 is up, -1 is down
@@ -50,6 +54,8 @@ public class TankDrive_Bucket extends OpMode{
         doorRight = hardwareMap.servo.get("doorRight");
         doorLeft = hardwareMap.servo.get("doorLeft");
         conveyorServo = hardwareMap.servo.get("conveyor");
+
+        motorLeft.setTargetPosition(100);
 
         //Set the conveyor position
         conveyorServo.setPosition(conveyorStop);

@@ -76,7 +76,7 @@ public class TankDrive_Bucket extends OpMode{
 
         //Arm Motor using Right Bumper and Trigger
         if(gamepad1.right_bumper){
-            motorArm.setPower(.2);
+            motorArm.setPower(.5);
         }else if(gamepad1.right_trigger > .2){
             motorArm.setPower(-.2);
         }else{

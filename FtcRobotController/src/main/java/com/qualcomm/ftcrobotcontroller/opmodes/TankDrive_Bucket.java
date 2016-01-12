@@ -78,7 +78,7 @@ public class TankDrive_Bucket extends OpMode{
         if(gamepad1.right_bumper){
             motorArm.setPower(.5);
         }else if(gamepad1.right_trigger > .2){
-            motorArm.setPower(-.2);
+            motorArm.setPower(-.5);
         }else{
             motorArm.setPower(0);
         }
@@ -104,6 +104,14 @@ public class TankDrive_Bucket extends OpMode{
                 doorLeft.setPosition(doorLeftOpen);
                 conveyorServo.setPosition(conveyorLeft);
             }
+        }
+
+        if(gamepad1.dpad_down){
+            motorRight.setPower(.01);
+            motorLeft.setPower(.01);
+        }else if(gamepad1.dpad_up){
+            motorRight.setPower(-.8);
+            motorLeft.setPower(-.8);
         }
 
         //Telemetry

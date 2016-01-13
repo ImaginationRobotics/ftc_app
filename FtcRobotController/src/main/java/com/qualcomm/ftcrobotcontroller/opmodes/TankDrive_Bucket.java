@@ -85,10 +85,13 @@ public class TankDrive_Bucket extends OpMode{
 
         //Door Right open and Conveyor Right
         if(gamepad1.dpad_right){
+            if(doorLeft.getPosition() == doorLeftOpen) {
+                doorLeft.setPosition(doorLeftClose);
+                conveyorServo.setPosition(conveyorStop);
+            }
             if(doorRight.getPosition() == doorRightOpen){
                 doorRight.setPosition(doorRightClose);
                 conveyorServo.setPosition(conveyorStop);
-
             }else if(doorRight.getPosition() == doorRightClose){
                 doorRight.setPosition(doorRightOpen);
                 conveyorServo.setPosition(conveyorRight);
@@ -97,6 +100,11 @@ public class TankDrive_Bucket extends OpMode{
 
         //Door Left open and Conveyor Left
         if(gamepad1.dpad_left){
+            if(doorRight.getPosition() == doorRightOpen){
+                doorRight.setPosition(doorRightClose);
+                conveyorServo.setPosition(conveyorStop);
+            }
+
             if(doorLeft.getPosition() == doorLeftOpen){
                 doorLeft.setPosition(doorLeftClose);
                 conveyorServo.setPosition(conveyorStop);
@@ -114,10 +122,10 @@ public class TankDrive_Bucket extends OpMode{
             motorLeft.setPower(-.8);
         }
 
-        //Telemetry
-        telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
-        telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
-        telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
+            //Telemetry
+            telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
+            telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
+            telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
         telemetry.addData("Left stick", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
     }
 

@@ -23,10 +23,15 @@ public class TankDrive_Bucket extends OpMode{
     double conveyorRight = 1;
     double conveyorLeft = 0;
 
+    double led = 0;
+    double ledPos = 1;
+    double ledNeg = -1;
+
     //Motors and servos
     DcMotor motorRight;
     DcMotor motorLeft;
     DcMotor motorArm;
+    DcMotor ledPower;
     Servo doorRight;
     Servo doorLeft;
     Servo conveyorServo;
@@ -114,6 +119,7 @@ public class TankDrive_Bucket extends OpMode{
             }
         }
 
+        //Motors conjoined drive
         if(gamepad1.dpad_down){
             motorRight.setPower(.01);
             motorLeft.setPower(.01);
@@ -122,10 +128,24 @@ public class TankDrive_Bucket extends OpMode{
             motorLeft.setPower(-.8);
         }
 
-            //Telemetry
-            telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
-            telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
-            telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
+        //LED settings toggles
+        if(gamepad1.start){
+            if(led == 0){
+                led = ledPos;
+                ledPower.setPower(ledPos);
+            }else if(led == ledPos){
+                led = ledNeg;
+                ledPower.setPower(ledNeg);
+            }else if(led == ledNeg){
+                led = ledPos;
+                ledPower.setPower(ledPos);
+            }
+        }
+
+        //Telemetry
+        telemetry.addData("Right tgt pwr", "Right pwr: " + String.format("%.2f", rightDrive));
+        telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
+        telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
         telemetry.addData("Left stick", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
     }
 

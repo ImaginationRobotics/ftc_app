@@ -14,24 +14,23 @@ import com.qualcomm.robotcore.util.Range;
 public class TankDrive_Bucket extends OpMode{
     //Servo position values
     double doorRightClose = 0;
-    double doorRightOpen = .6;
+    double doorRightOpen = .8;
 
     double doorLeftClose = 1;
-    double doorLeftOpen = .4;
+    double doorLeftOpen = .2;
 
     double conveyorStop = .48;
     double conveyorRight = 1;
     double conveyorLeft = 0;
 
-    double led = 0;
-    double ledPos = 1;
-    double ledNeg = -1;
+    double ledPower = 0;
+    boolean ledSwitch = true;
 
     //Motors and servos
     DcMotor motorRight;
     DcMotor motorLeft;
     DcMotor motorArm;
-    DcMotor ledPower;
+    DcMotor led;
     Servo doorRight;
     Servo doorLeft;
     Servo conveyorServo;
@@ -55,6 +54,9 @@ public class TankDrive_Bucket extends OpMode{
         doorRight = hardwareMap.servo.get("doorRight");
         doorLeft = hardwareMap.servo.get("doorLeft");
         conveyorServo = hardwareMap.servo.get("conveyor");
+
+        //Led power
+        led = hardwareMap.dcMotor.get("led");
 
         //Set the conveyor position
         conveyorServo.setPosition(conveyorStop);
@@ -128,17 +130,20 @@ public class TankDrive_Bucket extends OpMode{
             motorLeft.setPower(-.8);
         }
 
-        //LED settings toggles
-        if(gamepad1.start){
-            if(led == 0){
-                led = ledPos;
-                ledPower.setPower(ledPos);
-            }else if(led == ledPos){
-                led = ledNeg;
-                ledPower.setPower(ledNeg);
-            }else if(led == ledNeg){
-                led = ledPos;
-                ledPower.setPower(ledPos);
+        //LED pulse
+        if(ledSwitch == true){
+            ledPower -= .01;
+            led.setPower(ledPower);
+
+            if(ledPower < -.99){
+                ledSwitch = false;
+            }
+        }else if(ledSwitch == false){
+            ledPower += .01;
+            led.setPower(ledPower);
+
+            if(ledPower > .99){
+                ledSwitch = true;
             }
         }
 
@@ -147,6 +152,7 @@ public class TankDrive_Bucket extends OpMode{
         telemetry.addData("Left tgt pwr", "Left pwr: " + String.format("%.2f", leftDrive));
         telemetry.addData("Right stick", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
         telemetry.addData("Left stick", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
+        telemetry.addData("LED Power", "LED Power: " + String.format("%.7f", ledPower));
     }
 
     @Override

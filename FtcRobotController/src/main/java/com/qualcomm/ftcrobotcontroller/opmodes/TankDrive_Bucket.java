@@ -8,7 +8,8 @@ import com.qualcomm.robotcore.util.Range;
 /**TankDrive_Bucket
  *
  * Code to drive two motors in tank drive, two hinge servos,
- *      one conveyor servo, and one worm driven arm.
+ *      one conveyor servo, one sweeper servo,
+ *      and one worm driven arm.
  */
 
 public class TankDrive_Bucket extends OpMode{
@@ -19,6 +20,7 @@ public class TankDrive_Bucket extends OpMode{
     double doorLeftClose = 1;
     double doorLeftOpen = .2;
 
+    int conveyorSwitch = 0; //0, 1, 2
     double conveyorStop = .48;
     double conveyorRight = 1;
     double conveyorLeft = 0;
@@ -35,6 +37,9 @@ public class TankDrive_Bucket extends OpMode{
     long lastPressB  = 0;
     long lastPressRight  = 0;
     long lastPressLeft  = 0;
+    long lastPressX = 0;
+    long lastPressY = 0;
+    long delay = 250;
 
     //Motors and servos
     DcMotor motorRight;
@@ -105,48 +110,71 @@ public class TankDrive_Bucket extends OpMode{
             motorArm.setPower(0);
         }
 
-        //Door Right open and Conveyor Right
+        //Conveyor Right
         if(gamepad1.dpad_right){
-            if(System.currentTimeMillis() > lastPressRight+500) {
-                if (doorLeft.getPosition() == doorLeftOpen) {
-                    doorLeft.setPosition(doorLeftClose);
-                    conveyorServo.setPosition(conveyorStop);
-                }
-                if (doorRight.getPosition() == doorRightOpen) {
-                    doorRight.setPosition(doorRightClose);
-                    conveyorServo.setPosition(conveyorStop);
-                } else if (doorRight.getPosition() == doorRightClose) {
-                    doorRight.setPosition(doorRightOpen);
+            if(System.currentTimeMillis() > lastPressRight+delay) {
+                if (conveyorSwitch == 0){
                     conveyorServo.setPosition(conveyorRight);
+                    conveyorSwitch = 1;
+                }else if (conveyorSwitch == 1) {
+                    conveyorServo.setPosition(conveyorStop);
+                    conveyorSwitch = 0;
+                }else if (conveyorSwitch == 2){
+                    conveyorServo.setPosition(conveyorRight);
+                    conveyorSwitch = 1;
                 }
 
                 lastPressRight = System.currentTimeMillis();
             }
         }
 
-        //Door Left open and Conveyor Left
+        //Conveyor Left
         if(gamepad1.dpad_left){
-            if(System.currentTimeMillis() > lastPressLeft+500) {
-                if (doorRight.getPosition() == doorRightOpen) {
-                    doorRight.setPosition(doorRightClose);
-                    conveyorServo.setPosition(conveyorStop);
-                }
-
-                if (doorLeft.getPosition() == doorLeftOpen) {
-                    doorLeft.setPosition(doorLeftClose);
-                    conveyorServo.setPosition(conveyorStop);
-                } else if (doorLeft.getPosition() == doorLeftClose) {
-                    doorLeft.setPosition(doorLeftOpen);
+            if(System.currentTimeMillis() > lastPressLeft+delay) {
+                if (conveyorSwitch == 0){
                     conveyorServo.setPosition(conveyorLeft);
+                    conveyorSwitch = 2;
+                }else if (conveyorSwitch == 2) {
+                    conveyorServo.setPosition(conveyorStop);
+                    conveyorSwitch = 0;
+                }else if (conveyorSwitch == 1){
+                    conveyorServo.setPosition(conveyorLeft);
+                    conveyorSwitch = 2;
                 }
 
                 lastPressLeft = System.currentTimeMillis();
             }
         }
 
+        //Door Right
+        if(gamepad1.y){
+            if(System.currentTimeMillis() > lastPressY+delay){
+                if(doorRight.getPosition() == doorRightClose) {
+                    doorRight.setPosition(doorRightOpen);
+                }else if(doorRight.getPosition() == doorRightOpen){
+                    doorRight.setPosition(doorRightClose);
+                }
+
+                lastPressY = System.currentTimeMillis();
+            }
+        }
+
+        //Door Left
+        if(gamepad1.x){
+            if(System.currentTimeMillis() > lastPressX+delay){
+                if(doorLeft.getPosition() == doorLeftClose) {
+                    doorLeft.setPosition(doorLeftOpen);
+                }else if(doorLeft.getPosition() == doorLeftOpen){
+                    doorLeft.setPosition(doorLeftClose);
+                }
+
+                lastPressX = System.currentTimeMillis();
+            }
+        }
+
         //Sweeper control
         if(gamepad1.a){
-            if(System.currentTimeMillis() > lastPressA+500) {
+            if(System.currentTimeMillis() > lastPressA+delay) {
                 if (sweeperSwitch != 1) {
                     sweeper.setPosition(sweeperForward);
                     sweeperSwitch = 1;
@@ -154,12 +182,13 @@ public class TankDrive_Bucket extends OpMode{
                     sweeper.setPosition(sweeperStop);
                     sweeperSwitch = 0;
                 }
+
                 lastPressA = System.currentTimeMillis();
             }
         }
 
         if(gamepad1.b){
-            if(System.currentTimeMillis() > lastPressB+500) {
+            if(System.currentTimeMillis() > lastPressB+delay) {
                 if (sweeperSwitch != 2) {
                     sweeper.setPosition(sweeperBackward);
                     sweeperSwitch = 2;

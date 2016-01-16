@@ -30,7 +30,7 @@ public class TankDrive_Bucket extends OpMode{
     double sweeperBackward = 0;
     int sweeperSwitch = 0; //0, 1, 2
 
-    double ledPower = 0;
+    double ledPower = 1;
     boolean ledSwitch = true;
 
     long lastPressA  = 0;
@@ -172,7 +172,7 @@ public class TankDrive_Bucket extends OpMode{
             }
         }
 
-        //Sweeper control
+        //Sweeper Right
         if(gamepad1.a){
             if(System.currentTimeMillis() > lastPressA+delay) {
                 if (sweeperSwitch != 1) {
@@ -187,6 +187,7 @@ public class TankDrive_Bucket extends OpMode{
             }
         }
 
+        //Sweeper Left
         if(gamepad1.b){
             if(System.currentTimeMillis() > lastPressB+delay) {
                 if (sweeperSwitch != 2) {

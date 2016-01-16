@@ -109,17 +109,7 @@ public class PushBotAuto extends PushBotTelemetry
             //
             run_using_encoders ();
 
-            //
-            // Start the drive wheel motors at full power.
-            //
             set_drive_power (1.0f, 1.0f);
-
-            //
-            // Have the motor shafts turned the required amount?
-            //
-            // If they haven't, then the op-mode remains in this state (i.e this
-            // block will be executed the next time this method is called).
-            //
             if (have_drive_encoders_reached (2880, 2880))
             {
                 //

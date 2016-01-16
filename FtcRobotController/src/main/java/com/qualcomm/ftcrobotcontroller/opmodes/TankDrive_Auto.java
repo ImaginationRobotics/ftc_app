@@ -1,12 +1,14 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by thomas on 1/6/16.
  */
-public class TankDrive_Auto extends PushBotTelemetry{ //Servo position values
+public class TankDrive_Auto extends OpMode { //Servo position values
     double doorRightClose = 0;
 
     double doorLeftClose = 1;
@@ -27,6 +29,8 @@ public class TankDrive_Auto extends PushBotTelemetry{ //Servo position values
     Servo doorLeft;
     Servo conveyorServo;
     Servo sweeper;
+
+    private int state = 0;
 
     @Override
     public void init(){
@@ -70,28 +74,29 @@ public class TankDrive_Auto extends PushBotTelemetry{ //Servo position values
         switch(state){
             case 0:{
                 reset_drive_encoders();
+                state++;
+            }
 
+            case 1:{
+                run_using_encoders();
                 set_drive_power(1.0f, 1.0f);
                 if (have_drive_encoders_reached (2880, 2880))
                 {
                     reset_drive_encoders();
-
                     set_drive_power (0.0f, 0.0f);
 
                     state++;
                 }
             }
 
-            case 1:{
+            case 2:{
                 run_using_encoders();
 
                 set_drive_power(-1.0f, -1.0f);
                 if (have_drive_encoders_reached (-2880, -2880))
                 {
                     reset_drive_encoders();
-
                     set_drive_power (0.0f, 0.0f);
-
                     state++;
                 }
             }
@@ -113,7 +118,205 @@ public class TankDrive_Auto extends PushBotTelemetry{ //Servo position values
                 ledSwitch = true;
             }
         }
+
+        telemetry.addData ("State", "State: " + state);
     }
 
-    private int state = 0;
+
+    void set_drive_power (double p_left_power, double p_right_power)
+
+    {
+        if (motorLeft != null)
+        {
+            motorLeft.setPower (p_left_power);
+        }
+        if (motorRight != null)
+        {
+            motorRight.setPower (p_right_power);
+        }
+
+    } // set_drive_power
+
+    public void reset_drive_encoders ()
+
+    {
+        //
+        // Reset the motor encoders on the drive wheels.
+        //
+        reset_left_drive_encoder ();
+        reset_right_drive_encoder ();
+
+    } // reset_drive_encoders
+
+    public void reset_left_drive_encoder ()
+
+    {
+        if (motorLeft != null)
+        {
+            motorLeft.setMode
+                    ( DcMotorController.RunMode.RESET_ENCODERS
+                    );
+        }
+
+    } // reset_left_drive_encoder
+
+    //--------------------------------------------------------------------------
+    //
+    // reset_right_drive_encoder
+    //
+    /**
+     * Reset the right drive wheel encoder.
+     */
+    public void reset_right_drive_encoder ()
+
+    {
+        if (motorRight != null)
+        {
+            motorRight.setMode
+                    (DcMotorController.RunMode.RESET_ENCODERS
+                    );
+        }
+
+    } // reset_right_drive_encoder
+
+    public void run_using_encoders ()
+
+    {
+        //
+        // Call other members to perform the action on both motors.
+        //
+        run_using_left_drive_encoder();
+        run_using_right_drive_encoder();
+
+    } // run_using_encoders
+
+    public void run_using_left_drive_encoder ()
+
+    {
+        if (motorLeft != null)
+        {
+            motorLeft.setMode
+                    ( DcMotorController.RunMode.RUN_USING_ENCODERS
+                    );
+        }
+
+    } // run_using_left_drive_encoder
+
+    //--------------------------------------------------------------------------
+    //
+    // run_using_right_drive_encoder
+    //
+    /**
+     * Set the right drive wheel encoder to run, if the mode is appropriate.
+     */
+    public void run_using_right_drive_encoder ()
+
+    {
+        if (motorRight != null)
+        {
+            motorRight.setMode
+                    ( DcMotorController.RunMode.RUN_USING_ENCODERS
+                    );
+        }
+
+    } // run_using_right_drive_encoder
+
+    boolean have_drive_encoders_reached
+            ( double p_left_count
+                    , double p_right_count
+            )
+
+    {
+        //
+        // Assume failure.
+        //
+        boolean l_return = false;
+
+        //
+        // Have the encoders reached the specified values?
+        //
+        if (has_left_drive_encoder_reached (p_left_count) &&
+                has_right_drive_encoder_reached (p_right_count))
+        {
+            //
+            // Set the status to a positive indication.
+            //
+            l_return = true;
+        }
+
+        //
+        // Return the status.
+        //
+        return l_return;
+
+    } // have_encoders_reached
+
+    boolean has_left_drive_encoder_reached (double p_count)
+
+    {
+        //
+        // Assume failure.
+        //
+        boolean l_return = false;
+
+        if (motorLeft != null)
+        {
+            //
+            // Has the encoder reached the specified values?
+            //
+            // TODO Implement stall code using these variables.
+            //
+            if (Math.abs (motorLeft.getCurrentPosition ()) > p_count)
+            {
+                //
+                // Set the status to a positive indication.
+                //
+                l_return = true;
+            }
+        }
+
+        //
+        // Return the status.
+        //
+        return l_return;
+
+    } // has_left_drive_encoder_reached
+
+    //--------------------------------------------------------------------------
+    //
+    // has_right_drive_encoder_reached
+    //
+    /**
+     * Indicate whether the right drive motor's encoder has reached a value.
+     */
+    boolean has_right_drive_encoder_reached (double p_count)
+
+    {
+        //
+        // Assume failure.
+        //
+        boolean l_return = false;
+
+        if (motorRight != null)
+        {
+            //
+            // Have the encoders reached the specified values?
+            //
+            // TODO Implement stall code using these variables.
+            //
+            if (Math.abs (motorRight.getCurrentPosition ()) > p_count)
+            {
+                //
+                // Set the status to a positive indication.
+                //
+                l_return = true;
+            }
+        }
+
+        //
+        // Return the status.
+        //
+        return l_return;
+
+    } // has_right_drive_encoder_reached
 }

@@ -10,13 +10,9 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class TankDrive_Auto extends OpMode { //Servo position values
     double doorRightClose = 0;
-
     double doorLeftClose = 1;
-
     double conveyorStop = .48;
-
     double sweeperStop = .495;
-
     double ledPower = 1;
     boolean ledSwitch = true;
 
@@ -30,7 +26,10 @@ public class TankDrive_Auto extends OpMode { //Servo position values
     Servo conveyorServo;
     Servo sweeper;
 
-    private int state = 0;
+    int state = 0;
+
+    public TankDrive_Auto(){
+    }
 
     @Override
     public void init(){
@@ -62,8 +61,7 @@ public class TankDrive_Auto extends OpMode { //Servo position values
         //Set the sweeper to stop
         sweeper.setPosition(sweeperStop);
     }
-    public TankDrive_Auto(){
-    }
+
 
     @Override public void start(){
         super.start();
@@ -75,6 +73,7 @@ public class TankDrive_Auto extends OpMode { //Servo position values
             case 0:{
                 reset_drive_encoders();
                 state++;
+                break;
             }
 
             case 1:{
@@ -87,6 +86,7 @@ public class TankDrive_Auto extends OpMode { //Servo position values
 
                     state++;
                 }
+                break;
             }
 
             case 2:{
@@ -99,6 +99,7 @@ public class TankDrive_Auto extends OpMode { //Servo position values
                     set_drive_power (0.0f, 0.0f);
                     state++;
                 }
+                break;
             }
         }
 

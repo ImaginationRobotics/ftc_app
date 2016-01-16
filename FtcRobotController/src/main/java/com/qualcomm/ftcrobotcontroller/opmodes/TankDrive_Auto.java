@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Created by thomas on 1/6/16.
  */
 public class TankDrive_Auto extends OpMode { //Servo position values
+    double wheelCircumference = 16.704729;
+    double ticksPerRev = 1120;
     double doorRightClose = 0;
     double doorLeftClose = 1;
     double conveyorStop = .48;
@@ -72,14 +74,18 @@ public class TankDrive_Auto extends OpMode { //Servo position values
         switch(state){
             case 0:{
                 reset_drive_encoders();
-                state++;
+                try {
+                    wait(10000);
+                } catch (InterruptedException ex) {
+                    state++;
+                }
                 break;
             }
 
             case 1:{
                 run_using_encoders();
                 set_drive_power(1.0f, 1.0f);
-                if (have_drive_encoders_reached (2880, 2880))
+                if (have_drive_encoders_reached (getTicks(10), getTicks(10)))
                 {
                     reset_drive_encoders();
                     set_drive_power (0.0f, 0.0f);
@@ -93,7 +99,7 @@ public class TankDrive_Auto extends OpMode { //Servo position values
                 run_using_encoders();
 
                 set_drive_power(-1.0f, -1.0f);
-                if (have_drive_encoders_reached (-2880, -2880))
+                if (have_drive_encoders_reached (getTicks(5), getTicks(5)))
                 {
                     reset_drive_encoders();
                     set_drive_power (0.0f, 0.0f);
@@ -320,4 +326,10 @@ public class TankDrive_Auto extends OpMode { //Servo position values
         return l_return;
 
     } // has_right_drive_encoder_reached
+
+
+    private int getTicks(int inches){
+        return (int)((inches / wheelCircumference) * ticksPerRev);
+    }
+
 }

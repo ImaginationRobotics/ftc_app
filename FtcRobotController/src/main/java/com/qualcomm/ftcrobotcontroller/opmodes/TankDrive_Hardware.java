@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by Thomas on 1/19/2016.
@@ -26,8 +25,10 @@ public class TankDrive_Hardware extends OpMode {
     double sweeperBackward = 0;
     int sweeperSwitch = 0; //0, 1, 2
 
-    double wheelCircumference = 16.6944;
-    double ticksPerRev = 1120;
+    double inchesPerTick = 0.01237; //13.62574 in / 1120 ticks
+    double wheelDistance = 15.5;
+    double wheelDiameter = 13.62574;
+    final double PI = 3.14159265359;
 
     double ledPower = 1;
     boolean ledSwitch = true;
@@ -46,7 +47,7 @@ public class TankDrive_Hardware extends OpMode {
         //Drive motors
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorRight.setDirection(DcMotor.Direction.REVERSE);
 
         //Arm motor, reversed so 1 is up, -1 is down
         motorArm = hardwareMap.dcMotor.get("motorArm");
@@ -73,6 +74,11 @@ public class TankDrive_Hardware extends OpMode {
     }
 
     @Override
+    public void start(){
+        super.start();
+    }
+
+    @Override
     public void loop(){
         //LED pulse
         if(ledSwitch == true){
@@ -92,16 +98,21 @@ public class TankDrive_Hardware extends OpMode {
         }
     }
 
+    @Override
+    public void stop(){
+        super.stop();
+    }
+
     //<editor-fold desc="Autonomous Functions">
     void set_drive_power (double p_left_power, double p_right_power)
     {
         if (motorLeft != null)
         {
-            motorLeft.setPower (Range.clip(p_left_power, -1, 1));
+            motorLeft.setPower (p_left_power);
         }
         if (motorRight != null)
         {
-            motorRight.setPower (Range.clip(p_right_power, -1, 1));
+            motorRight.setPower (p_right_power);
         }
 
     } // set_drive_power
@@ -205,8 +216,8 @@ public class TankDrive_Hardware extends OpMode {
     } // run_using_right_drive_encoder
 
     boolean have_drive_encoders_reached
-            ( double p_left_count
-                    , double p_right_count
+            ( int p_left_count
+                    , int p_right_count
             )
 
     {
@@ -234,7 +245,7 @@ public class TankDrive_Hardware extends OpMode {
 
     } // have_encoders_reached
 
-    boolean has_left_drive_encoder_reached (double p_count)
+    boolean has_left_drive_encoder_reached (int p_count)
 
     {
         //
@@ -249,7 +260,7 @@ public class TankDrive_Hardware extends OpMode {
             //
             // TODO Implement stall code using these variables.
             //
-            if (Math.abs (motorLeft.getCurrentPosition ()) > p_count)
+            if (Math.abs (motorLeft.getCurrentPosition ()) >= p_count)
             {
                 //
                 // Set the status to a positive indication.
@@ -272,7 +283,7 @@ public class TankDrive_Hardware extends OpMode {
     /**
      * Indicate whether the right drive motor's encoder has reached a value.
      */
-    boolean has_right_drive_encoder_reached (double p_count)
+    boolean has_right_drive_encoder_reached (int p_count)
 
     {
         //
@@ -287,7 +298,7 @@ public class TankDrive_Hardware extends OpMode {
             //
             // TODO Implement stall code using these variables.
             //
-            if (Math.abs (motorRight.getCurrentPosition ()) > p_count)
+            if (Math.abs (motorRight.getCurrentPosition ()) >= p_count)
             {
                 //
                 // Set the status to a positive indication.
@@ -304,8 +315,12 @@ public class TankDrive_Hardware extends OpMode {
     } // has_right_drive_encoder_reached
     //</editor-fold>
 
-    int getTicks(int inches){
-        return (int)((inches / wheelCircumference) * ticksPerRev);
+    int getTicks(double inches){
+        return (int)(inches / inchesPerTick);
+    }
+
+    double getInches(int ticks){
+        return (ticks * inchesPerTick);
     }
 
     double scaleInput(double dVal)  {
@@ -334,6 +349,26 @@ public class TankDrive_Hardware extends OpMode {
         }
 
         // return scaled value.
-        return Range.clip(dScale, -1, 1) ;
+        return dScale ;
     }
+
+//    double turnPivotDegrees (int Degrees){
+//        if(Degrees > 0){
+//            double Distance = ((2* wheelDistance * PI)/360)*Degrees;
+//
+//            while(nMotorEncoder[LeftMotor]<(1440*(Distance/(wheelDiameter *PI)))){
+//            }
+//            return Distance;
+//        }
+//
+//        else{
+//            double Distance = ((2* wheelDistance * PI)/360)*-Degrees;
+//
+//            while(nMotorEncoder[RightMotor]<(1440*(Distance/(wheelDiameter *PI)))){
+//            }
+//
+//            return Distance;
+//        }
+//
+//    }
 }

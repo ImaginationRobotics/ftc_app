@@ -4,8 +4,8 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
  * Created by thomas on 1/6/16.
  */
 public class TankDrive_Auto extends TankDrive_Hardware {
-    long startTime;
     private int state = 0;
+    private long lastTime;
 
 
     public TankDrive_Auto(){
@@ -14,13 +14,16 @@ public class TankDrive_Auto extends TankDrive_Hardware {
     @Override
     public void init(){
         super.init();
+        run_using_encoders();
+        reset_drive_encoders();
+        state = 0;
+        led.setPower(1);
     }
 
     @Override
     public void start(){
         super.start();
-        reset_drive_encoders();
-        startTime = System.currentTimeMillis();
+        lastTime = System.nanoTime();
     }
 
     @Override
@@ -28,48 +31,71 @@ public class TankDrive_Auto extends TankDrive_Hardware {
 
         switch(state){
             case 0:{
-                reset_drive_encoders();
-                if(System.currentTimeMillis() > startTime+10000){
+                if(System.nanoTime() >= lastTime + 5000){
+                    reset_drive_encoders();
                     state++;
                 }
+                led.setPower(-1);
+
                 break;
             }
 
             case 1:{
-                run_using_encoders();
-
                 set_drive_power(0.5f, 0.5f);
-                if (have_drive_encoders_reached (getTicks(10), getTicks(10)))
-                {
-//                    reset_drive_encoders();
+                if (has_right_drive_encoder_reached(getTicks(40))) {
                     stopDrive();
-
+                    lastTime = System.nanoTime();
                     state++;
                 }
-
+                led.setPower(1);
                 break;
             }
 
-//            case 2:{
-//                run_using_encoders();
-//
-//                set_drive_power(-0.5f, -0.5f);
-//                if (have_drive_encoders_reached (-getTicks(10), -getTicks(10)))
-//                {
-//                    reset_drive_encoders();
-//                    stopDrive();
-//                    state++;
-//                }
-//
-//                break;
-//            }
+            case 2:{
+                if(System.nanoTime() >= lastTime + 5000){
+                    reset_drive_encoders();
+                    state++;
+                }
+                led.setPower(-1);
+                break;
+            }
+
+            case 3:{
+                set_drive_power(-0.3f, 0.3f);
+                if (have_drive_encoders_reached (-getTicks(48.69/4), getTicks(48.69/4))){
+                    stopDrive();
+                    this.resetStartTime();
+                     state++;
+                }
+                led.setPower(1);
+                break;
+            }
+
+            case 4:{
+                if(System.nanoTime() >= lastTime + 5000){
+                    reset_drive_encoders();
+                    state++;
+                }
+                led.setPower(-1);
+                break;
+            }
+
+            case 5:{
+                set_drive_power(0.5f, 0.5f);
+                if(has_right_drive_encoder_reached(getTicks(5))){
+                    stopDrive();
+                    state++;
+                }
+                led.setPower(1);
+                break;
+            }
         }
 
-        super.loop();
+        //super.loop();
 
         telemetry.addData("00", "State: " + state);
-        telemetry.addData("01", "Left Drive: " + motorLeft.getPower() + ", " + motorLeft.getCurrentPosition ());
-        telemetry.addData("02", "Right Drive: " + motorRight.getPower() + ", " + motorRight.getCurrentPosition());
+        telemetry.addData("01", "Left Drive: " + motorLeft.getPower() + ", " + motorLeft.getCurrentPosition() + ", " + getInches(motorLeft.getCurrentPosition()));
+        telemetry.addData("02", "Right Drive: " + motorRight.getPower() + ", " + motorRight.getCurrentPosition() + ", " + getInches(motorRight.getCurrentPosition()));
         telemetry.addData("03", "Arm: " + motorArm.getPower() + ", " + motorArm.getCurrentPosition());
         telemetry.addData("04", "LED: " + led.getPower());
     }

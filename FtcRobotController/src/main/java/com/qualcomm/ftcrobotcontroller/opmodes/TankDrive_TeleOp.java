@@ -34,7 +34,7 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
     public void loop(){
         super.loop();
         //Set motor power
-        set_drive_power(gamepad1.left_stick_y, gamepad1.right_stick_y);
+        set_drive_power(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
 
         //Arm Motor using Right Bumper and Trigger
         if(gamepad1.right_bumper){
@@ -139,11 +139,11 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
 
         //Motors conjoined drive
         if(gamepad1.dpad_down){
-            motorRight.setPower(.01);
-            motorLeft.setPower(.01);
+            motorRight.setPower(-.01);
+            motorLeft.setPower(-.01);
         }else if(gamepad1.dpad_up){
-            motorRight.setPower(-.8);
-            motorLeft.setPower(-.8);
+            motorRight.setPower(.8);
+            motorLeft.setPower(.8);
         }
 
         //Telemetry

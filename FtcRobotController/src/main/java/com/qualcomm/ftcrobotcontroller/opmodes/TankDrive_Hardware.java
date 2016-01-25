@@ -61,6 +61,7 @@ public class TankDrive_Hardware extends OpMode {
 
         //Led power
         led = hardwareMap.dcMotor.get("led");
+        led.setPower(1);
 
         //Set the conveyor position
         conveyorServo.setPosition(conveyorStop);

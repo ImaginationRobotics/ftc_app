@@ -89,14 +89,19 @@ public class TankDrive_LN_Testing extends LinearOpMode {
         telemetry.addData("00", "Step 1");
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
+
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
+
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
+
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
+
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
+
         driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
     }

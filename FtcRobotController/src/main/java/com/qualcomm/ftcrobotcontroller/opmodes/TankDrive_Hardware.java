@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by Thomas on 1/19/2016.
+ *
+ * This holds all the variables and settings for loop style programs.
  */
 public class TankDrive_Hardware extends OpMode {
     double doorRightClose = 0;
@@ -81,21 +83,25 @@ public class TankDrive_Hardware extends OpMode {
 
     @Override
     public void loop(){
-        //LED pulse
-        if(ledSwitch == true){
-            ledPower -= .01;
-            led.setPower(ledPower);
+        try {
+            //LED pulse
+            if (ledSwitch == true) {
+                ledPower -= .01;
+                led.setPower(ledPower);
 
-            if(ledPower < -.99){
-                ledSwitch = false;
-            }
-        }else if(ledSwitch == false){
-            ledPower += .01;
-            led.setPower(ledPower);
+                if (ledPower < -.99) {
+                    ledSwitch = false;
+                }
+            } else if (ledSwitch == false) {
+                ledPower += .01;
+                led.setPower(ledPower);
 
-            if(ledPower > .99){
-                ledSwitch = true;
+                if (ledPower > .99) {
+                    ledSwitch = true;
+                }
             }
+        }catch (Exception ex){
+            telemetry.addData("EX", ex.getMessage());
         }
     }
 

@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * Created by Thomas on 1/23/2016.
+ * Created by Thomas on 1/28/2016.
  *
- * Main autonomous function used in linear style, rather than a loop style.
+ * This class was created to use as a testing ground, rather than screwing
+ * with the actual autonomous
  */
-public class TankDrive_Auto_Ln extends LinearOpMode {
+public class TankDrive_LN_Testing extends LinearOpMode {
     double doorRightClose = 0;
     double doorRightOpen = .8;
 
@@ -86,31 +87,18 @@ public class TankDrive_Auto_Ln extends LinearOpMode {
 
         led.setPower(-1);
         telemetry.addData("00", "Step 1");
-        driveInches(40, .3f, driveDirection.forward);
-
+        driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
-
-        led.setPower(1);
-        telemetry.addData("00", "Step 2");
-        turnPivotDegrees(90, .3f, turnDirection.left);
-
+        driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
-
-        led.setPower(-1);
-        telemetry.addData("00", "Step 3");
-        driveInches(25, .3f, driveDirection.forward);
-
+        driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
-
-        led.setPower(1);
-        telemetry.addData("00", "Step 4");
-        turnPivotDegrees(45, .3f, turnDirection.left);
-
+        driveInches(10, .3f, driveDirection.forward);
         sleep(1000);
-
-        led.setPower(-1);
-        telemetry.addData("00", "Step 5");
-        driveInches(12, .3f, driveDirection.forward);
+        driveInches(10, .3f, driveDirection.forward);
+        sleep(1000);
+        driveInches(10, .3f, driveDirection.forward);
+        sleep(1000);
     }
 
     //<editor-fold desc="Autonomous Functions">

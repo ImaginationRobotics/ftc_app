@@ -59,7 +59,7 @@ public class TankDrive_Hardware extends OpMode {
         doorRight = hardwareMap.servo.get("doorRight");
         doorLeft = hardwareMap.servo.get("doorLeft");
         conveyorServo = hardwareMap.servo.get("conveyor");
-        sweeper = hardwareMap.servo.get("sweeper");
+        sweeper = hardwareMap.servo.get("sweeperServo");
 
         //Led power
         led = hardwareMap.dcMotor.get("led");
@@ -72,7 +72,7 @@ public class TankDrive_Hardware extends OpMode {
         doorRight.setPosition(doorRightClose);
         doorLeft.setPosition(doorLeftClose);
 
-        //Set the sweeper to stop
+        //Set the sweeperServo to stop
         sweeper.setPosition(sweeperStop);
     }
 
@@ -359,7 +359,7 @@ public class TankDrive_Hardware extends OpMode {
         return dScale ;
     }
 
-//    double turnPivotDegrees (int Degrees){
+//    double pivotDegrees (int Degrees){
 //        if(Degrees > 0){
 //            double Distance = ((2* wheelDistance * PI)/360)*Degrees;
 //

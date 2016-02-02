@@ -1,13 +1,16 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 /**TankDrive_TeleOp
  *
  * Code to drive two motors in tank drive, two hinge servos,
- *      one conveyor servo, one sweeper servo,
+ *      one conveyor servo, one sweeperServo servo,
  *      one worm driven arm, and an LED setup.
  */
 
-public class TankDrive_TeleOp extends TankDrive_Hardware{
+public class TankDrive_TeleOp extends OpMode{
+    Robot9826 robot;
     long lastPressA  = 0;
     long lastPressB  = 0;
     long lastPressRight  = 0;
@@ -18,11 +21,13 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
 
     /** Constructors*/
     public TankDrive_TeleOp(){
+
     }
 
     @Override
     public void init(){
-        super.init();
+        robot = new Robot9826(super.hardwareMap, super.telemetry);
+        robot.init();
     }
 
     @Override
@@ -33,31 +38,25 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
     @Override
     public void loop(){
         try {
-            super.loop();
             //Set motor power
-            set_drive_power(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+            robot.drive(-gamepad1.right_stick_y, -gamepad1.left_stick_y);
 
             //Arm Motor using Right Bumper and Trigger
             if (gamepad1.right_bumper) {
-                motorArm.setPower(.5);
+                robot.driveArm(.6, Robot9826.ArmDirection.up);
             } else if (gamepad1.right_trigger > .2) {
-                motorArm.setPower(-.5);
+                robot.driveArm(.3, Robot9826.ArmDirection.down);
             } else {
-                motorArm.setPower(0);
+                robot.driveArm(0, Robot9826.ArmDirection.stop);
             }
 
             //Conveyor Right
             if (gamepad1.dpad_right) {
                 if (System.currentTimeMillis() > lastPressRight + delay) {
-                    if (conveyorSwitch == 0) {
-                        conveyorServo.setPosition(conveyorRight);
-                        conveyorSwitch = 1;
-                    } else if (conveyorSwitch == 1) {
-                        conveyorServo.setPosition(conveyorStop);
-                        conveyorSwitch = 0;
-                    } else if (conveyorSwitch == 2) {
-                        conveyorServo.setPosition(conveyorRight);
-                        conveyorSwitch = 1;
+                    if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.stop || robot.getConveyorDirection() == Robot9826.ConveyorDirection.left) {
+                        robot.conveyorToggle(Robot9826.ConveyorDirection.right);
+                    } else if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.right) {
+                        robot.conveyorToggle(Robot9826.ConveyorDirection.stop);
                     }
 
                     lastPressRight = System.currentTimeMillis();
@@ -67,15 +66,10 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
             //Conveyor Left
             if (gamepad1.dpad_left) {
                 if (System.currentTimeMillis() > lastPressLeft + delay) {
-                    if (conveyorSwitch == 0) {
-                        conveyorServo.setPosition(conveyorLeft);
-                        conveyorSwitch = 2;
-                    } else if (conveyorSwitch == 2) {
-                        conveyorServo.setPosition(conveyorStop);
-                        conveyorSwitch = 0;
-                    } else if (conveyorSwitch == 1) {
-                        conveyorServo.setPosition(conveyorLeft);
-                        conveyorSwitch = 2;
+                    if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.stop || robot.getConveyorDirection() == Robot9826.ConveyorDirection.right) {
+                        robot.conveyorToggle(Robot9826.ConveyorDirection.left);
+                    } else if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.left) {
+                        robot.conveyorToggle(Robot9826.ConveyorDirection.stop);
                     }
 
                     lastPressLeft = System.currentTimeMillis();
@@ -85,11 +79,7 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
             //Door Right
             if (gamepad1.y) {
                 if (System.currentTimeMillis() > lastPressY + delay) {
-                    if (doorRight.getPosition() == doorRightClose) {
-                        doorRight.setPosition(doorRightOpen);
-                    } else if (doorRight.getPosition() == doorRightOpen) {
-                        doorRight.setPosition(doorRightClose);
-                    }
+                    robot.toggleRightDoor();
 
                     lastPressY = System.currentTimeMillis();
                 }
@@ -98,40 +88,32 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
             //Door Left
             if (gamepad1.x) {
                 if (System.currentTimeMillis() > lastPressX + delay) {
-                    if (doorLeft.getPosition() == doorLeftClose) {
-                        doorLeft.setPosition(doorLeftOpen);
-                    } else if (doorLeft.getPosition() == doorLeftOpen) {
-                        doorLeft.setPosition(doorLeftClose);
-                    }
+                    robot.toggleLeftDoor();
 
                     lastPressX = System.currentTimeMillis();
                 }
             }
 
-            //Sweeper Right
+            //Sweeper Forward
             if (gamepad1.a) {
                 if (System.currentTimeMillis() > lastPressA + delay) {
-                    if (sweeperSwitch != 1) {
-                        sweeper.setPosition(sweeperForward);
-                        sweeperSwitch = 1;
-                    } else if (sweeperSwitch == 1) {
-                        sweeper.setPosition(sweeperStop);
-                        sweeperSwitch = 0;
+                    if (robot.getSweeperDirection() == Robot9826.SweeperDirection.stop || robot.getSweeperDirection() == Robot9826.SweeperDirection.reverse) {
+                        robot.sweeperToggle(Robot9826.SweeperDirection.forward);
+                    } else if (robot.getSweeperDirection() == Robot9826.SweeperDirection.forward) {
+                        robot.sweeperToggle(Robot9826.SweeperDirection.stop);
                     }
 
                     lastPressA = System.currentTimeMillis();
                 }
             }
 
-            //Sweeper Left
+            //Sweeper Reverse
             if (gamepad1.b) {
                 if (System.currentTimeMillis() > lastPressB + delay) {
-                    if (sweeperSwitch != 2) {
-                        sweeper.setPosition(sweeperBackward);
-                        sweeperSwitch = 2;
-                    } else if (sweeperSwitch == 2) {
-                        sweeper.setPosition(sweeperStop);
-                        sweeperSwitch = 0;
+                    if (robot.getSweeperDirection() == Robot9826.SweeperDirection.stop || robot.getSweeperDirection() == Robot9826.SweeperDirection.forward) {
+                        robot.sweeperToggle(Robot9826.SweeperDirection.reverse);
+                    } else if (robot.getSweeperDirection() == Robot9826.SweeperDirection.reverse) {
+                        robot.sweeperToggle(Robot9826.SweeperDirection.stop);
                     }
 
                     lastPressB = System.currentTimeMillis();
@@ -140,17 +122,14 @@ public class TankDrive_TeleOp extends TankDrive_Hardware{
 
             //Motors conjoined drive
             if (gamepad1.dpad_down) {
-                motorRight.setPower(-.01);
-                motorLeft.setPower(-.01);
+                robot.drive(.01, Robot9826.DriveDirection.reverse);
             } else if (gamepad1.dpad_up) {
-                motorRight.setPower(.8);
-                motorLeft.setPower(.8);
+                robot.drive(.9, Robot9826.DriveDirection.forward);
             }
 
             //Telemetry
             telemetry.addData("00", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
             telemetry.addData("01", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
-            telemetry.addData("02", "LED Power: " + String.format("%.7f", ledPower));
         }catch (Exception ex){
             telemetry.addData("EX", ex.getMessage());
         }

@@ -37,8 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 public class FtcOpModeRegister implements OpModeRegister {
     public void register(OpModeManager manager) {
         manager.register("TeleOp", TankDrive_TeleOp.class);
-        manager.register("Linear Autonomous", TankDrive_Auto_Ln.class);
         manager.register("Autonomous", TankDrive_Auto.class);
-        manager.register("Liner Auto Testing", TankDrive_LN_Testing.class);
+        manager.register("Auto Testing", TankDrive_Test_Auto.class);
     }
 }

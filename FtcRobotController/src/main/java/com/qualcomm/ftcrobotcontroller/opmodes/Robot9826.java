@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robocol.Telemetry;
 
-import org.imaginationrobotics.team9826.EncoderMotorTask;
-
 /**
  * Created by Thomas on 1/31/2016.
  */
@@ -33,17 +31,13 @@ public class Robot9826 {
     public enum SweeperDirection {forward, reverse, stop}
     SweeperDirection sweeperDirection;
 
-    final double wheelDistance = 15.375;
-    final double wheelDiameter = 4.7;//14.8125 / PI
-    final double PI = 3.14159265359;
+    final double wheelDistance = 16.625;
+    final double pivotSlideFactor = 1.9;
+    final double wheelDiameter = 5.07;
     final int tickPerRev = 1120;
 
-    public enum DriveDirection {forward, reverse}
-    public enum TurnDirection {left, right}
+    public enum DriveDirection {forward, reverse, left, right}
     public enum ArmDirection {up, down, stop}
-
-    double ledPower = 1;
-    boolean ledSwitch = true;
 
     //Motors and servos
     DcMotor motorRight;
@@ -65,13 +59,11 @@ public class Robot9826 {
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
         motorRight.setDirection(DcMotor.Direction.REVERSE);
-        motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+
 
         //Arm motor, reversed so 1 is up, -1 is down
         motorArm = hardwareMap.dcMotor.get("motorArm");
         motorArm.setDirection(DcMotor.Direction.REVERSE);
-        motorArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
 
         //Bucket motors and servos
         doorRight = hardwareMap.servo.get("doorRight");
@@ -114,56 +106,24 @@ public class Robot9826 {
                 drive(-speed, -speed);
                 break;
             }
+            case left: {
+                drive(speed, -speed);
+                break;
+            }
+            case right: {
+                drive(-speed, speed);
+                break;
+            }
         }
     }
 
-//    public void drive(int inches, double speed, DriveDirection direction){
-//        switch(direction){
-//            case forward: {
-//                motorLeft.setTargetPosition(inchesToTicks(inches));
-//                motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                drive(speed, speed);
-//                break;
-//            }
-//            case reverse: {
-//                motorLeft.setTargetPosition(-inchesToTicks(inches));
-//                motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                drive(-speed, -speed);
-//                break;
-//            }
-//        }
-//    }
-//
-//    public void pivot(int degrees, double speed, TurnDirection direction){
-//        switch(direction){
-//            case right: {
-//                motorLeft.setTargetPosition(degreesToTicks(degrees));
-//                motorRight.setTargetPosition(-degreesToTicks(degrees));
-//                motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                drive(-speed, speed);
-//                break;
-//            }
-//            case left: {
-//                motorLeft.setTargetPosition(-degreesToTicks(degrees));
-//                motorRight.setTargetPosition(degreesToTicks(degrees));
-//                motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//                drive(speed, -speed);
-//                break;
-//            }
-//        }
-//    }
-
-    public synchronized void drive(double rightSpeed, double leftSpeed){
+    public void drive(double rightSpeed, double leftSpeed){
         if (motorLeft != null) {
             motorLeft.setPower(leftSpeed);
         }
         if (motorRight != null) {
             motorRight.setPower(rightSpeed);
         }
-        telemetry.addData("R01", "Left Drive: " + motorLeft.getPower() + ", " + motorLeft.getCurrentPosition() + ", " + ticksToInches(motorLeft.getCurrentPosition()));
-        telemetry.addData("R02", "Right Drive: " + motorRight.getPower() + ", " + motorRight.getCurrentPosition() + ", " + ticksToInches(motorRight.getCurrentPosition()));
     }
 
     void stopDrive() {
@@ -173,7 +133,6 @@ public class Robot9826 {
         if (motorRight != null) {
             motorRight.setPower(0);
         }
-
     }
 
     public void driveArm(double speed, ArmDirection direction){
@@ -240,7 +199,7 @@ public class Robot9826 {
                 sweeperServo.setPosition(sweeperForward);
                 break;
             }
-            case reverse:{
+            case reverse: {
                 sweeperServo.setPosition(sweeperBackward);
                 break;
             }
@@ -255,21 +214,27 @@ public class Robot9826 {
         led.setPower(power);
     }
 
-    public int inchesToTicks(int inches) {
-        return (int) (inches / ((wheelDiameter * PI) / tickPerRev));
+    public int inchesToTicks(double inches) {
+        return (int) (inches / ((wheelDiameter * Math.PI) / tickPerRev));
     }
 
     public int degreesToTicks(int degrees){
-        return (int)((wheelDistance * PI) / 360) * degrees;
+        return inchesToTicks((((wheelDistance + pivotSlideFactor) * Math.PI) / 360) * degrees);
     }
 
     public double ticksToInches(int ticks) {
-        return (ticks * ((wheelDiameter * PI) / tickPerRev));
+        return (ticks * ((wheelDiameter * Math.PI) / tickPerRev));
     }
 
     public void reset_drive_encoders() {
         reset_left_drive_encoder();
         reset_right_drive_encoder();
+    }
+
+    public void reset_arm_encoder(){
+        if (motorArm != null) {
+            motorArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        }
     }
 
     public void reset_left_drive_encoder() {
@@ -299,13 +264,36 @@ public class Robot9826 {
         if (motorRight != null) {
             motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         }
-
     }
 
-    boolean have_drive_encoders_reached(int p_left_count, int p_right_count){
+    public void run_using_arm_drive_encoder() {
+        if (motorArm != null) {
+            motorArm.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        }
+    }
+
+    boolean have_drive_encoders_reached(int count){
         boolean l_return = false;
-        if (has_left_drive_encoder_reached(p_left_count) &&
-                has_right_drive_encoder_reached(p_right_count)) {
+        if (has_left_drive_encoder_reached(count) &&
+                has_right_drive_encoder_reached(count)) {
+            l_return = true;
+        }
+        return l_return;
+    }
+
+    boolean have_drive_encoders_reset(){
+        boolean l_return = false;
+        if (has_left_drive_encoder_reset() &&
+                has_right_drive_encoder_reset()) {
+            l_return = true;
+        }
+        return l_return;
+    }
+
+    boolean have_drive_encoders_reached(int leftCount, int rightCount){
+        boolean l_return = false;
+        if (has_left_drive_encoder_reached(leftCount) &&
+                has_right_drive_encoder_reached(rightCount)) {
             l_return = true;
         }
         return l_return;
@@ -317,10 +305,8 @@ public class Robot9826 {
             // TODO Implement stall code using these variables.
             if (Math.abs(motorLeft.getCurrentPosition()) >= count) {
                 l_return = true;
-                telemetry.addData("R03", "Left Encoder has reached " + count);
             }
         }
-        telemetry.addData("R03", "Left Encoder: " + count + " - " + motorLeft.getCurrentPosition() + " = " + (count - motorLeft.getCurrentPosition() + " (" + l_return + ")"));
         return l_return;
     }
 
@@ -333,11 +319,111 @@ public class Robot9826 {
             // TODO Implement stall code using these variables.
             if (Math.abs(motorRight.getCurrentPosition()) >= count) {
                 l_return = true;
-                telemetry.addData("R04", "Right Encoder has reached " + count);
             }
         }
-        telemetry.addData("R04", "Right Encoder: " + count + " - " + motorRight.getCurrentPosition() + " = " + (count - motorRight.getCurrentPosition() + " (" + l_return + ")"));
         return l_return;
     }
 
+    boolean has_left_drive_encoder_reset() {
+        boolean l_return = false;
+        if (motorLeft != null) {
+            if (Math.abs(motorLeft.getCurrentPosition()) == 0) {
+                l_return = true;
+            }
+        }
+        return l_return;
+    }
+
+    /**
+     * Indicate whether the right drive motor's encoder has reset.
+     */
+    boolean has_right_drive_encoder_reset(){
+        boolean l_return = false;
+        if (motorRight != null) {
+            if (Math.abs(motorRight.getCurrentPosition()) == 0) {
+                l_return = true;
+            }
+        }
+        return l_return;
+    }
+
+    boolean has_arm_drive_encoder_reached(int count){
+        boolean l_return = false;
+        if (motorArm != null) {
+            // TODO Implement stall code using these variables.
+            if (Math.abs(motorArm.getCurrentPosition()) >= count) {
+                l_return = true;
+            }
+        }
+        return l_return;
+    }
+
+    boolean has_arm_drive_encoder_reset(){
+        boolean l_return = false;
+        if (motorArm != null) {
+            if (Math.abs(motorArm.getCurrentPosition()) == 0) {
+                l_return = true;
+            }
+        }
+        return l_return;
+    }
+
+    public void run_without_encoders(){
+        run_without_right_drive_encoder();
+        run_without_arm_drive_encoder();
+        run_without_left_drive_encoder();
+    }
+
+    public void run_without_left_drive_encoder () {
+        if (motorLeft != null)
+        {
+            if (motorLeft.getMode() ==
+                    DcMotorController.RunMode.RESET_ENCODERS)
+            {
+                motorLeft.setMode
+                        ( DcMotorController.RunMode.RUN_WITHOUT_ENCODERS
+                        );
+            }
+        }
+
+    }
+
+    public void run_without_right_drive_encoder () {
+        if (motorRight != null)
+        {
+            if (motorRight.getMode() ==
+                    DcMotorController.RunMode.RESET_ENCODERS)
+            {
+                motorRight.setMode
+                        (DcMotorController.RunMode.RUN_WITHOUT_ENCODERS
+                        );
+            }
+        }
+
+    }
+
+    public void run_without_arm_drive_encoder () {
+        if (motorArm != null)
+        {
+            if (motorArm.getMode() ==
+                    DcMotorController.RunMode.RESET_ENCODERS)
+            {
+                motorArm.setMode
+                        (DcMotorController.RunMode.RUN_WITHOUT_ENCODERS
+                        );
+            }
+        }
+
+    }
+
+    boolean hasWaited(long lastStateChange, double seconds){
+        return System.currentTimeMillis() > (lastStateChange + (seconds * 1000));
+    }
+
+    void updateTelemetry(){
+        telemetry.addData("R01", "Left Drive: " + motorLeft.getPower() + ", " + motorLeft.getCurrentPosition() + ", " + ticksToInches(motorLeft.getCurrentPosition()));
+        telemetry.addData("R02", "Right Drive: " + motorRight.getPower() + ", " + motorRight.getCurrentPosition() + ", " + ticksToInches(motorRight.getCurrentPosition()));
+        telemetry.addData("R03", "Arm Drive: " + motorArm.getPower() + ", " + motorArm.getCurrentPosition());
+        telemetry.addData("R04", "LED: " + led.getPower());
+    }
 }

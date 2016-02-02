@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 /**
  * Created by thomas on 1/6/16.
  */
-public class TankDrive_Auto extends OpMode {
+public class TankDrive_Test_Auto extends OpMode {
     Robot9826 robot;
     private int state;
     private long lastStateChange;
 
 
-    public TankDrive_Auto(){
+    public TankDrive_Test_Auto(){
     }
 
     @Override
@@ -31,22 +31,10 @@ public class TankDrive_Auto extends OpMode {
     @Override
     public void loop(){
         switch(state){
-            /**Robot Start*/
             case 0:{
-                robot.setLedPower(-1);
-                robot.reset_drive_encoders();
-                if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
-                    state++;
-                }
-
-                break;
-            }
-
-            /**Drive 1*/
-            case 1:{
                 robot.run_using_encoders();
                 robot.drive(0.5, Robot9826.DriveDirection.forward);
-                if (robot.have_drive_encoders_reached(robot.inchesToTicks(42))) {
+                if (robot.have_drive_encoders_reached(robot.inchesToTicks(10))) {
                     robot.stopDrive();
                     lastStateChange = System.currentTimeMillis();
                     state++;
@@ -55,19 +43,18 @@ public class TankDrive_Auto extends OpMode {
                 break;
             }
 
-            /**Wait*/
-            case 2:{
+            case 1:{
                 robot.setLedPower(-1);
                 robot.reset_drive_encoders();
                 if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
                     state++;
+                    lastStateChange = System.currentTimeMillis();
                 }
 
                 break;
             }
 
-            /**Turn 1*/
-            case 3:{
+            case 2:{
                 robot.run_using_encoders();
                 robot.drive(0.5, Robot9826.DriveDirection.left);
                 if (robot.have_drive_encoders_reached(robot.degreesToTicks(90))) {
@@ -79,44 +66,21 @@ public class TankDrive_Auto extends OpMode {
                 break;
             }
 
-            /**Wait*/
-            case 4:{
+            case 3:{
                 robot.setLedPower(-1);
                 robot.reset_drive_encoders();
                 if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
                     state++;
-                }
-                break;
-            }
-
-            /**Drive 2*/
-            case 5:{
-                robot.run_using_encoders();
-                robot.drive(0.5, Robot9826.DriveDirection.forward);
-                if (robot.have_drive_encoders_reached(robot.inchesToTicks(37))) {
-                    robot.stopDrive();
                     lastStateChange = System.currentTimeMillis();
-                    state++;
                 }
-                robot.setLedPower(1);
+
                 break;
             }
 
-            /**Wait*/
-            case 6:{
-                robot.setLedPower(-1);
-                robot.reset_drive_encoders();
-                if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
-                    state++;
-                }
-                break;
-            }
-
-            /**Turn 2*/
-            case 7:{
+            case 4:{
                 robot.run_using_encoders();
                 robot.drive(0.5, Robot9826.DriveDirection.left);
-                if (robot.have_drive_encoders_reached(robot.degreesToTicks(45))) {
+                if (robot.have_drive_encoders_reached(robot.degreesToTicks(90))) {
                     robot.stopDrive();
                     lastStateChange = System.currentTimeMillis();
                     state++;
@@ -125,80 +89,78 @@ public class TankDrive_Auto extends OpMode {
                 break;
             }
 
-            /**Wait*/
-            case 8:{
+            case 5:{
                 robot.setLedPower(-1);
                 robot.reset_drive_encoders();
                 if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
                     state++;
+                    lastStateChange = System.currentTimeMillis();
                 }
                 break;
             }
 
-            /**Drive 3*/
+            case 6:{
+                robot.run_using_encoders();
+                robot.drive(0.5, Robot9826.DriveDirection.left);
+                if (robot.have_drive_encoders_reached(robot.degreesToTicks(90))) {
+                    robot.stopDrive();
+                    lastStateChange = System.currentTimeMillis();
+                    state++;
+                }
+                robot.setLedPower(1);
+                break;
+             }
+
+            case 7:{
+                robot.setLedPower(-1);
+                robot.reset_drive_encoders();
+                if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
+                    state++;
+                    lastStateChange = System.currentTimeMillis();
+                }
+                break;
+            }
+
+            case 8:{
+                robot.run_using_encoders();
+                robot.drive(0.5, Robot9826.DriveDirection.left);
+                if (robot.have_drive_encoders_reached(robot.degreesToTicks(90))) {
+                    robot.stopDrive();
+                    lastStateChange = System.currentTimeMillis();
+                    state++;
+                }
+                robot.setLedPower(1);
+                break;
+            }
+
             case 9:{
+                robot.setLedPower(-1);
+                robot.reset_drive_encoders();
+                if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
+                    state++;
+                    lastStateChange = System.currentTimeMillis();
+                }
+                break;
+            }
+
+            case 10:{
                 robot.run_using_encoders();
                 robot.drive(0.5, Robot9826.DriveDirection.forward);
-                if (robot.have_drive_encoders_reached(robot.inchesToTicks(20))) {
+                if (robot.have_drive_encoders_reached(robot.inchesToTicks(10))) {
                     robot.stopDrive();
                     lastStateChange = System.currentTimeMillis();
                     state++;
                 }
                 robot.setLedPower(1);
                 break;
-            }
 
-            /**Wait*/
-            case 10:{
-                robot.setLedPower(-1);
-                robot.reset_drive_encoders();
-                if(robot.have_drive_encoders_reset() && robot.hasWaited(lastStateChange, 2)){
-                    state++;
-                }
-                break;
-            }
-
-            /**Reset Arm Encoder*/
-            case 11:{
-                robot.setLedPower(-1);
-                robot.reset_arm_encoder();
-                if(robot.has_arm_drive_encoder_reset()){
-                    state++;
-                }
-                break;
-            }
-
-            /**Move Arm Down*/
-            case 12:{
-                robot.run_using_arm_drive_encoder();
-                robot.driveArm(0.5, Robot9826.ArmDirection.down);
-                if (robot.has_arm_drive_encoder_reached(1700)) {
-                    robot.driveArm(0, Robot9826.ArmDirection.stop);
-                    lastStateChange = System.currentTimeMillis();
-                    state++;
-                }
-                robot.setLedPower(1);
-                break;
-            }
-
-            /**Drive 4 CLIMB RAMP*/
-            case 13:{
-                robot.run_using_encoders();
-                robot.drive(0.9, Robot9826.DriveDirection.forward);
-                if (robot.have_drive_encoders_reached(robot.inchesToTicks(20))) {
-                    robot.stopDrive();
-                    lastStateChange = System.currentTimeMillis();
-                    state++;
-                }
-                robot.setLedPower(1);
-                break;
             }
         }
-
         telemetry.addData("A00", "State: " + String.format("%d", state));
         robot.updateTelemetry();
-    }
 
+    }
+    
 
     @Override
     public void stop(){

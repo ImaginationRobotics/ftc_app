@@ -38,7 +38,7 @@ public class TankDrive_TeleOp extends OpMode{
     @Override
     public void loop(){
         try {
-            //Set motor power
+            /**Set motor power*/
             robot.drive(-gamepad1.right_stick_y, -gamepad1.left_stick_y);
 
             //Arm Motor using Right Bumper and Trigger
@@ -50,7 +50,7 @@ public class TankDrive_TeleOp extends OpMode{
                 robot.driveArm(0, Robot9826.ArmDirection.stop);
             }
 
-            //Conveyor Right
+            /**Conveyor Right*/
             if (gamepad1.dpad_right) {
                 if (System.currentTimeMillis() > lastPressRight + delay) {
                     if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.stop || robot.getConveyorDirection() == Robot9826.ConveyorDirection.left) {
@@ -63,7 +63,7 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Conveyor Left
+            /**Conveyor Left*/
             if (gamepad1.dpad_left) {
                 if (System.currentTimeMillis() > lastPressLeft + delay) {
                     if (robot.getConveyorDirection() == Robot9826.ConveyorDirection.stop || robot.getConveyorDirection() == Robot9826.ConveyorDirection.right) {
@@ -76,7 +76,7 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Door Right
+            /**Door Right*/
             if (gamepad1.y) {
                 if (System.currentTimeMillis() > lastPressY + delay) {
                     robot.toggleRightDoor();
@@ -85,7 +85,7 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Door Left
+            /**Door Left*/
             if (gamepad1.x) {
                 if (System.currentTimeMillis() > lastPressX + delay) {
                     robot.toggleLeftDoor();
@@ -94,7 +94,7 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Sweeper Forward
+            /**Sweeper Forward*/
             if (gamepad1.a) {
                 if (System.currentTimeMillis() > lastPressA + delay) {
                     if (robot.getSweeperDirection() == Robot9826.SweeperDirection.stop || robot.getSweeperDirection() == Robot9826.SweeperDirection.reverse) {
@@ -107,7 +107,7 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Sweeper Reverse
+            /**Sweeper Reverse*/
             if (gamepad1.b) {
                 if (System.currentTimeMillis() > lastPressB + delay) {
                     if (robot.getSweeperDirection() == Robot9826.SweeperDirection.stop || robot.getSweeperDirection() == Robot9826.SweeperDirection.forward) {
@@ -120,16 +120,22 @@ public class TankDrive_TeleOp extends OpMode{
                 }
             }
 
-            //Motors conjoined drive
+            /**Motors conjoined drive*/
             if (gamepad1.dpad_down) {
                 robot.drive(.01, Robot9826.DriveDirection.reverse);
             } else if (gamepad1.dpad_up) {
                 robot.drive(.9, Robot9826.DriveDirection.forward);
             }
 
-            //Telemetry
+            /**LED Power Cycle*/
+            robot.cycleLedPower();
+
+            /**Telemetry*/
             telemetry.addData("00", "Right stick: " + String.format("%.2f", gamepad1.right_stick_y));
             telemetry.addData("01", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
+            telemetry.addData("02", "Right power: " + String.format("%.2f", robot.motorRight.getPower()));
+            telemetry.addData("03", "Left power: " + String.format("%.2f", robot.motorLeft.getPower()));
+            telemetry.addData("04", "Arm Power: " + String.format("&.2f", robot.motorArm.getPower()));
         }catch (Exception ex){
             telemetry.addData("EX", ex.getMessage());
         }

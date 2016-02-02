@@ -39,6 +39,10 @@ public class Robot9826 {
     public enum DriveDirection {forward, reverse, left, right}
     public enum ArmDirection {up, down, stop}
 
+    double ledPower = 1;
+    public enum LEDPower {up, down, stop}
+    LEDPower ledPowerDir = LEDPower.down;
+
     //Motors and servos
     DcMotor motorRight;
     DcMotor motorLeft;
@@ -88,6 +92,7 @@ public class Robot9826 {
         sweeperDirection = SweeperDirection.stop;
     }
 
+    /**Conveyor and Sweeper Direction*/
     public ConveyorDirection getConveyorDirection(){
         return conveyorDirection;
     }
@@ -96,6 +101,7 @@ public class Robot9826 {
         return sweeperDirection;
     }
 
+    //<editor-fold desc="Drive Functions">
     public void drive(double speed, DriveDirection direction){
         switch(direction){
             case forward: {
@@ -153,7 +159,9 @@ public class Robot9826 {
             }
         }
     }
+    //</editor-fold desc="Drive Functions">
 
+    //<editor-fold desc="Bucket Toggles">
     public void toggleLeftDoor(){
         if(doorLeft != null) {
             if (doorLeft.getPosition() == doorLeftClose) {
@@ -209,11 +217,31 @@ public class Robot9826 {
             }
         }
     }
+    //</editor-fold desc="Bucket Toggles">
 
+    //<editor-fold desc="LED Functions">
     public void setLedPower(double power){
         led.setPower(power);
     }
 
+    public void cycleLedPower(){
+        if (ledPowerDir == LEDPower.down){
+            setLedPower(ledPower--);
+
+            if(ledPower == -1){
+                ledPowerDir = LEDPower.up;
+            }
+        }else if(ledPowerDir == LEDPower.up){
+            setLedPower(ledPower++);
+
+            if(ledPower == 1){
+                ledPowerDir = LEDPower.down;
+            }
+        }
+    }
+    ///</editor-fold desc="LED Functions">
+
+    //<editor-fold desc="Encoder Math">
     public int inchesToTicks(double inches) {
         return (int) (inches / ((wheelDiameter * Math.PI) / tickPerRev));
     }
@@ -225,7 +253,9 @@ public class Robot9826 {
     public double ticksToInches(int ticks) {
         return (ticks * ((wheelDiameter * Math.PI) / tickPerRev));
     }
+    //</editor-fold desc="Encoder Math">
 
+    //<editor-fold desc="Encoder Functions">
     public void reset_drive_encoders() {
         reset_left_drive_encoder();
         reset_right_drive_encoder();
@@ -310,9 +340,7 @@ public class Robot9826 {
         return l_return;
     }
 
-    /**
-     * Indicate whether the right drive motor's encoder has reached a value.
-     */
+    /**Indicate whether the right drive motor's encoder has reached a value*/
     boolean has_right_drive_encoder_reached(int count){
         boolean l_return = false;
         if (motorRight != null) {
@@ -334,9 +362,7 @@ public class Robot9826 {
         return l_return;
     }
 
-    /**
-     * Indicate whether the right drive motor's encoder has reset.
-     */
+    /**Indicate whether the right drive motor's encoder has reset*/
     boolean has_right_drive_encoder_reset(){
         boolean l_return = false;
         if (motorRight != null) {
@@ -415,6 +441,7 @@ public class Robot9826 {
         }
 
     }
+    //</editor-fold desc="Encoder Functions">
 
     boolean hasWaited(long lastStateChange, double seconds){
         return System.currentTimeMillis() > (lastStateChange + (seconds * 1000));

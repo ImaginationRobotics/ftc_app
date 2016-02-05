@@ -3,7 +3,11 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 /**
- * Created by thomas on 1/6/16.
+ * Created by thomas on 1/6/16
+ *
+ * TankDrive_Auto
+ *
+ * An autonomous for the Red side of the field.
  */
 public class TankDrive_Auto extends OpMode {
     Robot9826 robot;

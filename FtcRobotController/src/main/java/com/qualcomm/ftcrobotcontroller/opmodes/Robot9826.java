@@ -5,9 +5,15 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robocol.Telemetry;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by Thomas on 1/31/2016.
+ *
+ * Robot9826
+ *
+ * This is a class file to hold all of our preset values and math to be used
+ *      across multiple autonomous and teleop functions.
  */
 public class Robot9826 {
     public Telemetry telemetry;
@@ -125,10 +131,10 @@ public class Robot9826 {
 
     public void drive(double rightSpeed, double leftSpeed){
         if (motorLeft != null) {
-            motorLeft.setPower(leftSpeed);
+            motorLeft.setPower(Range.clip(leftSpeed, -1, 1));
         }
         if (motorRight != null) {
-            motorRight.setPower(rightSpeed);
+            motorRight.setPower(Range.clip(rightSpeed, -1, 1));
         }
     }
 
@@ -145,11 +151,11 @@ public class Robot9826 {
         if (motorArm != null){
             switch(direction){
                 case up: {
-                    motorArm.setPower(speed);
+                    motorArm.setPower(Range.clip(speed, -1, 1));
                     break;
                 }
                 case down:{
-                    motorArm.setPower(-speed);
+                    motorArm.setPower(Range.clip(-speed, -1, 1));
                     break;
                 }
                 case stop:{
@@ -221,20 +227,20 @@ public class Robot9826 {
 
     //<editor-fold desc="LED Functions">
     public void setLedPower(double power){
-        led.setPower(power);
+        led.setPower(Range.clip(power, -1, 1));
     }
 
     public void cycleLedPower(){
         if (ledPowerDir == LEDPower.down){
-            setLedPower(ledPower--);
+            setLedPower(ledPower -= .01);
 
-            if(ledPower == -1){
+            if(ledPower <= -.9){
                 ledPowerDir = LEDPower.up;
             }
         }else if(ledPowerDir == LEDPower.up){
-            setLedPower(ledPower++);
+            setLedPower(ledPower += .01);
 
-            if(ledPower == 1){
+            if(ledPower >= .9){
                 ledPowerDir = LEDPower.down;
             }
         }

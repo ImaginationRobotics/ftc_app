@@ -45,7 +45,7 @@ public class TankDrive_TeleOp extends OpMode{
             if (gamepad1.right_bumper) {
                 robot.driveArm(.6, Robot9826.ArmDirection.up);
             } else if (gamepad1.right_trigger > .2) {
-                robot.driveArm(.3, Robot9826.ArmDirection.down);
+                robot.driveArm(.5, Robot9826.ArmDirection.down);
             } else {
                 robot.driveArm(0, Robot9826.ArmDirection.stop);
             }
@@ -135,7 +135,7 @@ public class TankDrive_TeleOp extends OpMode{
             telemetry.addData("01", "Left stick: " + String.format("%.2f", gamepad1.left_stick_y));
             telemetry.addData("02", "Right power: " + String.format("%.2f", robot.motorRight.getPower()));
             telemetry.addData("03", "Left power: " + String.format("%.2f", robot.motorLeft.getPower()));
-            telemetry.addData("04", "Arm Power: " + String.format("&.2f", robot.motorArm.getPower()));
+            telemetry.addData("04", "Arm Power: " + String.format("%.2f", robot.motorArm.getPower()));
         }catch (Exception ex){
             telemetry.addData("EX", ex.getMessage());
         }

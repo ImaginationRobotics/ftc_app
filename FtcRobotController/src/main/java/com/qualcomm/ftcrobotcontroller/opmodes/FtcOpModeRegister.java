@@ -34,6 +34,10 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
+import org.ImaginationRobotics.Team9826.TankDrive_Auto;
+import org.ImaginationRobotics.Team9826.TankDrive_TeleOp;
+import org.ImaginationRobotics.Team9826.TankDrive_Test_Auto;
+
 public class FtcOpModeRegister implements OpModeRegister {
     public void register(OpModeManager manager) {
         manager.register("TeleOp", TankDrive_TeleOp.class);

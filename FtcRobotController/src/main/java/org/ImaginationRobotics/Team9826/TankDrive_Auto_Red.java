@@ -5,17 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 /**
  * Created by thomas on 1/6/16
  *
- * TankDrive_Auto
+ * TankDrive_Auto_Red
  *
  * An autonomous for the Red side of the field.
  */
-public class TankDrive_Auto extends OpMode {
+public class TankDrive_Auto_Red extends OpMode {
     Robot9826 robot;
     private int state;
     private long lastStateChange;
 
 
-    public TankDrive_Auto(){
+    public TankDrive_Auto_Red(){
     }
 
     @Override

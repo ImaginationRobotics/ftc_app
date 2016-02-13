@@ -31,7 +31,7 @@ public class Robot9826 {
     public enum ConveyorDirection {left, right, stop}
     ConveyorDirection conveyorDirection;
 
-    final double sweeperStop = .495;
+    final double sweeperStop = .498;
     final double sweeperForward = 1;
     final double sweeperBackward = 0;
     public enum SweeperDirection {forward, reverse, stop}
